@@ -1,1 +1,73 @@
-Git code is here
+var vz_sc_software = Class.create();
+vz_sc_software.prototype = {
+    initialize: function(current) {
+        //current = Desktop Software RITM or Task glide record
+        if (current) {
+            this.tableName = current.sys_class_name.toString();
+        } else {
+            this.tableName = '';
+        }
+        this.current = null;
+
+        if (this.tableName == 'sc_req_item') {
+            //current = RITM
+            this.current = current;
+        } else if (this.tableName == 'sc_task') {
+            //current = Catalog Task
+            //this.current = current.request_item;
+            this.current = this._getRitmGrFromTask(current);
+            this.sc_task = current;
+
+        }
+
+        this.manualTrigger = false;
+        this.work_notes = "";
+
+        this.logCheck = gs.getProperty("com.software.ldap.debug", "true");
+        this.LOGGER_SOURCE = 'SOFTWARELOGCHECK';
+        this.showMsginInc = '';
+    },
+
+  _getComputerGr: function() {
+        var result = new GlideRecord("cmdb_ci_computer");
+
+        //new CI machine_name variable is a reference field instead of hostname
+        if (this.current.variables.machine_name) {
+            if (!result.get(this.current.variables.machine_name.toString())) {
+                if (!result.get('name', this.current.variables.machine_name.toString())) {
+                    result = null;
+                }
+            }
+        } else if (this.current.variables.machine_names) {
+            //Very old flow, remove after new form is released
+            if (!result.get(this.getComputerFromListCollector())) {
+                result = null;
+            }
+        } else {
+            result = null;
+        }
+
+        return result;
+    },
+   spkg: function() {
+        var result;
+        if (this.current) {
+            if (!this._spkg) {
+                this._spkg = this._get_software_gr(this._get_software_sys_id());
+            }
+            result = this._spkg;
+        }
+        return result;
+    },
+   computer: function() {
+        var result;
+        if (this.current) {
+            if (!this._computer) {
+                this._computer = this._getComputerGr();
+            }
+            result = this._computer;
+        }
+        return result;
+    },
+
+};
