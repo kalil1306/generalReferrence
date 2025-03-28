@@ -1,0 +1,9 @@
+--------------- To close complete the RITM -----------------
+var gr = new GlideRecord('sc_req_item');
+gr.addQuery('number', '');
+gr.query();
+if(gr.next()){
+    gr.state = 3;
+    gr.update();
+}
+---------------------------------------------------------------------------------------
