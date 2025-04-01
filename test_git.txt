@@ -69,5 +69,31 @@ vz_sc_software.prototype = {
         }
         return result;
     },
+ spkg: function() {
+        var result;
+        if (this.current) {
+            if (!this._spkg) {
+                this._spkg = this._get_software_gr(this._get_software_sys_id());
+            }
+            result = this._spkg;
+        }
+        return result;
+    },
+
+  _get_software_gr: function(softwareID) {
+        var result = null;
+
+        if (softwareID) {
+            var spkg = new GlideRecord("cmdb_ci_spkg");
+            spkg.addQuery("sys_id", softwareID);
+            spkg.query();
+
+            if (spkg.next()) {
+                result = spkg;
+            }
+        }
+
+        return result;
+    },
 
 };
