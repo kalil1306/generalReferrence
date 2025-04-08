@@ -1,1 +1,37 @@
+---------- flow action -------
+---------- VTRADR_Accounting Approval group_Action ------------------
+
+(function execute(inputs, outputs) {
+// ... code ...
+
+var region = inputs.region;
+var vzconnect = inputs.vz_connect.toLowerCase();
+
+if (vzconnect == 'yes') {
+    outputs.group = gs.getProperty('vtrader.accountingtask.assignmentgroup');
+} else {
+    if (vzconnect == 'yes') {
+        if (region == 'emea') {
+            outputs.group = gs.getProperty('vtrader.accountingapprover.vzconnect.emea.accounting');
+        } else if (region == 'apac') {
+            outputs.group = gs.getProperty('vtrader.accountingapprover.vzconnect.apac.accounting');
+        } else {
+            outputs.group = gs.getProperty('vtrader.accountingapprover.vzconnect.latam.accounting');
+        }
+    } else {
+        if (region == 'emea') {
+            outputs.group = gs.getProperty('vtrader.accountingapprover.vzb.emea.accounting');
+        } else if (region == 'apac') {
+            outputs.group = gs.getProperty('vtrader.accountingapprover.vzb.apac.accounting');
+        } else {
+            outputs.group = gs.getProperty('vtrader.accountingapprover.vzb.latam.accounting');
+        }
+    }
+}
+
+})(inputs, outputs);
+
+
+        
+    
 
