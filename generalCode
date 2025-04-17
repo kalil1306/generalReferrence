@@ -7,3 +7,7 @@ if(gr.next()){
     gr.update();
 }
 ---------------------------------------------------------------------------------------
+
+var dupSerial = '{"AssetClass":"ABSOLYTE / 311090","Model":"45","Quantity":"1","Manufacturer":"3","Description":"5","ManufacturerPartNumber":"1","SerialNumber":"2","Condition":"Used"},{"AssetClass":"ABSOLYTE / 311090","Model":"2343","Quantity":"1","Manufacturer":"23423","Description":"23423","ManufacturerPartNumber":"34","SerialNumber":"45","Condition":"Used"}';
+var arr_dupSerial = '[' + dupSerial + ']';
+console.log(JSON.parse(arr_dupSerial));
