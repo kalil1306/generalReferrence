@@ -11,3 +11,27 @@ if(gr.next()){
 var dupSerial = '{"AssetClass":"ABSOLYTE / 311090","Model":"45","Quantity":"1","Manufacturer":"3","Description":"5","ManufacturerPartNumber":"1","SerialNumber":"2","Condition":"Used"},{"AssetClass":"ABSOLYTE / 311090","Model":"2343","Quantity":"1","Manufacturer":"23423","Description":"23423","ManufacturerPartNumber":"34","SerialNumber":"45","Condition":"Used"}';
 var arr_dupSerial = '[' + dupSerial + ']';
 console.log(JSON.parse(arr_dupSerial));
+
+
+function onSubmit() {
+    var dupSerial = g_form.getValue('your_variable_name'); // Replace with your actual variable name
+    var arr_dupSerial = JSON.parse('[' + dupSerial + ']');
+
+    var serialArr = [];
+
+    for (var i = 0; i < arr_dupSerial.length; i++) {
+        var serial = arr_dupSerial[i].SerialNumber;
+
+        // Check if serial number already exists in array
+        for (var j = 0; j < serialArr.length; j++) {
+            if (serialArr[j] === serial) {
+                alert("Duplicate SerialNumber found: " + serial + ". Cannot submit the form.");
+                return false;
+            }
+        }
+
+        serialArr.push(serial);
+    }
+
+    return true; // No duplicates, allow submission
+}
