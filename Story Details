@@ -29,3 +29,15 @@ For each set by Name:
 - Mark duplicate record by setting attribute column to: DELETE
 - Existing Table Cleaner job will remove duplicate record
 
+Requirement: 
+
+1. Find the duplicate record in the cmdb_ci_server table group by name field and recently updated record using Updated field and
+discovery_source as ITAM, sys_class_name is one of AIX Server, ESX Server, HPUX Server, Linux Server, Server, Solaris Server, Windows Server
+so here first record is primary record and rest of the records if found then it is duplicate for those records set 'attributes' column as DELETE
+
+
+2. With the duplicate records found get the sys_id of those records and do a query in task_ci table in the ci_item field, 
+if the sys_id matches then remove the value from the ci_item field in that record in task_ci table aand set the primary record sys_id of those duplicate 
+records which found in step 1.
+
+
