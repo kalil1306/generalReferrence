@@ -40,4 +40,9 @@ so here first record is primary record and rest of the records if found then it 
 if the sys_id matches then remove the value from the ci_item field in that record in task_ci table aand set the primary record sys_id of those duplicate 
 records which found in step 1.
 
+3. Add these below 2 lines to override for updating the ci_item field in the task_ci table and while setting the attribbutes in the cmds_ci_server table for the duplicate records 
+gr.setWorkflow(false);
+gr.autoSysFields(false);
+
+
 
