@@ -55,6 +55,58 @@ RACK ENCLOSURES
 status is not retired
 status is retired & last update was in the last 90 days
 
+Answer:
+
+SELECT [assetid]
+      ,[source]
+      ,[devicename]
+      ,[physical_virtual]
+      ,[fqdn]
+      ,[status]
+      ,[manufacturer]
+      ,[serialnumber]
+      ,[decommissionDate]
+      ,[cpucount]
+      ,[corecount]
+      ,[cpuspeed]
+      ,[os]
+      ,[osversion]
+      ,[Environment]
+      ,[businessunit]
+      ,[assetsupportlevel]
+      ,[discovery_source]
+      ,[model_id]
+      ,[app]
+      ,[BC]
+      ,[custodianeid]
+      ,[DirectorEID]
+      ,[appl_ref]
+      ,[ostype]
+      ,[locationcode]
+      ,[LastUpdateDate]
+      ,[Type]
+FROM [ServiceNow].[SAM]
+WHERE [Type] IN (
+    'SERVERS',
+    'VIRTUAL GUEST',
+    'VIRTUAL MACHINE',
+    'VMWARE ESX SERVER',
+    'BLADE ENCLOSURES',
+    'SOLARIS GLOBAL ZONE',
+    'SOLARIS LDOM',
+    'SOLARIS NON-GLOBAL ZONE',
+    'SOLARIS FRAME DOMAIN',
+    'RACK ENCLOSURES'
+)
+AND (
+    ([status] <> 'Retired')
+    OR
+    ([status] = 'Retired' AND [LastUpdateDate] > GETDATE() - 90)
+)
+AND (
+    [Manufacturer] IS NULL OR [Manufacturer] <> 'Software House'
+)
+----------------------------------------------------------------------------
 vz_servers_SAM_delta: Data source
 SQL Statement:
 SELECT [assetid]
@@ -89,4 +141,49 @@ WHERE ([Type] <> 'IMAGING/VIDEO DEVICES' OR [Type] IS NULL) AND ([Manufacturer] 
 
 2) the SAM data source vz_servers_SAM_delta is filtered to only bring in the list of Type values in the description & where status is not retired
 
+Answer:
+
+SELECT [assetid]
+      ,[source]
+      ,[devicename]
+      ,[physical_virtual]
+      ,[fqdn]
+      ,[status]
+      ,[manufacturer]
+      ,[serialnumber]
+      ,[decommissionDate]
+      ,[cpucount]
+      ,[corecount]
+      ,[cpuspeed]
+      ,[os]
+      ,[osversion]
+      ,[Environment]
+      ,[businessunit]
+      ,[assetsupportlevel]
+      ,[discovery_source]
+      ,[model_id]
+      ,[app]
+      ,[BC]
+      ,[custodianeid]
+      ,[DirectorEID]
+      ,[appl_ref]
+      ,[ostype]
+      ,[locationcode]
+      ,[LastUpdateDate]
+      ,[Type]
+FROM [ServiceNow].[SAM]
+WHERE [Type] IN (
+    'SERVERS',
+    'VIRTUAL GUEST',
+    'VIRTUAL MACHINE',
+    'VMWARE ESX SERVER',
+    'BLADE ENCLOSURES',
+    'SOLARIS GLOBAL ZONE',
+    'SOLARIS LDOM',
+    'SOLARIS NON-GLOBAL ZONE',
+    'SOLARIS FRAME DOMAIN',
+    'RACK ENCLOSURES'
+)
+AND [status] <> 'Retired'
+AND ([Manufacturer] IS NULL OR [Manufacturer] <> 'Software House')
 
