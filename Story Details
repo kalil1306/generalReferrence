@@ -36,7 +36,7 @@ discovery_source as ITAM, sys_class_name is one of AIX Server, ESX Server, HPUX 
 so here first record is primary record and rest of the records if found then it is duplicate for those records set 'attributes' column as DELETE
 
 
-2. With the duplicate records found get the sys_id of those records and do a query in task_ci table in the ci_item field, 
+2. With the duplicate records found in step 1 get the sys_id of those records and do a query in task_ci table in the ci_item field, 
 if the sys_id matches then remove the value from the ci_item field in that record in task_ci table aand set the primary record sys_id of those duplicate 
 records which found in step 1.
 
