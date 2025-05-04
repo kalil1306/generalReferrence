@@ -1,5 +1,7 @@
 STRY0937491 - SAM Data Source - Enable IRE:
 --------------------------------------------------------------------------------------
+vz_server_sam: Data source
+
 SELECT [assetid]
       ,[source]
       ,[devicename]
@@ -53,4 +55,38 @@ RACK ENCLOSURES
 status is not retired
 status is retired & last update was in the last 90 days
 
+vz_servers_SAM_delta: Data source
+SQL Statement:
+SELECT [assetid]
+      ,[source]
+      ,[devicename]
+      ,[physical_virtual]
+      ,[fqdn]
+      ,[status]
+      ,[manufacturer]
+      ,[serialnumber]
+      ,[decommissionDate]
+      ,[cpucount]
+      ,[corecount]
+      ,[cpuspeed]
+      ,[os]
+      ,[osversion]
+      ,[Environment]
+      ,[businessunit]
+      ,[assetsupportlevel]
+      ,[discovery_source]
+      ,[model_id]
+      ,[app]
+      ,[BC]
+      ,[custodianeid]
+      ,[DirectorEID]
+      ,[appl_ref]
+      ,[ostype]
+      ,[locationcode]
+      ,[LastUpdateDate]
+  FROM [ServiceNow].[SAM]
+WHERE ([Type] <> 'IMAGING/VIDEO DEVICES' OR [Type] IS NULL) AND ([Manufacturer] IS NULL OR [Manufacturer] <> 'Software House')
+
 2) the SAM data source vz_servers_SAM_delta is filtered to only bring in the list of Type values in the description & where status is not retired
+
+
