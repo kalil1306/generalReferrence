@@ -1,189 +1,31 @@
-STRY0937491 - SAM Data Source - Enable IRE:
---------------------------------------------------------------------------------------
-vz_server_sam: Data source
+STRY1014430 - Remove duplicate ITAM servers by name
 
-SELECT [assetid]
-      ,[source]
-      ,[devicename]
-      ,[physical_virtual]
-      ,[fqdn]
-      ,[status]
-      ,[manufacturer]
-      ,[serialnumber]
-      ,[decommissionDate]
-      ,[cpucount]
-      ,[corecount]
-      ,[cpuspeed]
-      ,[os]
-      ,[osversion]
-      ,[Environment]
-      ,[businessunit]
-      ,[assetsupportlevel]
-      ,[discovery_source]
-      ,[model_id]
-      ,[app]
-      ,[BC]
-      ,[custodianeid]
-      ,[DirectorEID]
-      ,[appl_ref]
-      ,[ostype]
-      ,[locationcode]
-      ,[LastUpdateDate]
-      ,[Type]
-  FROM [ServiceNow].[SAM]
-  WHERE (
-        ([Type] <> 'IMAGING/VIDEO DEVICES' OR [Type] IS NULL) AND [status] <> 'Retired' AND ([Manufacturer] IS NULL OR [Manufacturer] <> 'Software House')
-                     ) OR (
-        ([Type] <> 'IMAGING/VIDEO DEVICES' OR [Type] IS NULL) AND [status] = 'Retired' AND [LastUpdateDate]>GETDATE()-90 AND ([Manufacturer] IS NULL OR [Manufacturer] <> 'Software House')
-                     )
+Note: Scripted updates for reference (step 3) and attributes (step 4) should skip workflow 
+and skip setting system fields by including these 2 functions on the GlideRecord
+gr.setWorkflow(false);
+gr.autoSysFields(false);
 
 Acceptance criteria:
-Bring the TYPE only if it is one of:
-Only bring in items with TYPE =
-SERVERS
-VIRTUAL GUEST
-VIRTUAL MACHINE
-VMWARE ESX SERVER
-BLADE ENCLOSURES
-SOLARIS GLOBAL ZONE
-SOLARIS LDOM
-SOLARIS NON-GLOBAL ZONE
-SOLARIS FRAME DOMAIN
-RACK ENCLOSURES
+I know this is complete when scripts are built that will automate:
 
-1) the SAM data source vz_servers_SAM is filtered to only bring in the list of Type values in the description & where either:
-status is not retired
-status is retired & last update was in the last 90 days
+1. Identification
 
-Answer:
+- Table: cmdb_ci_server & all children
+- Discovery Source = ITAM
+- Class is Server but NOT IBM Mainframe, IBM Mainframe LPAR, IBM Mainframe Linux, Server Chassis
+    (OR Class Is: AIX Server, ESX Server, HPUX Server, Linux Server, Server, Solaris Server, Windows Server)
+- More than 1 record by Name
 
-SELECT [assetid]
-      ,[source]
-      ,[devicename]
-      ,[physical_virtual]
-      ,[fqdn]
-      ,[status]
-      ,[manufacturer]
-      ,[serialnumber]
-      ,[decommissionDate]
-      ,[cpucount]
-      ,[corecount]
-      ,[cpuspeed]
-      ,[os]
-      ,[osversion]
-      ,[Environment]
-      ,[businessunit]
-      ,[assetsupportlevel]
-      ,[discovery_source]
-      ,[model_id]
-      ,[app]
-      ,[BC]
-      ,[custodianeid]
-      ,[DirectorEID]
-      ,[appl_ref]
-      ,[ostype]
-      ,[locationcode]
-      ,[LastUpdateDate]
-      ,[Type]
-FROM [ServiceNow].[SAM]
-WHERE [Type] IN (
-    'SERVERS',
-    'VIRTUAL GUEST',
-    'VIRTUAL MACHINE',
-    'VMWARE ESX SERVER',
-    'BLADE ENCLOSURES',
-    'SOLARIS GLOBAL ZONE',
-    'SOLARIS LDOM',
-    'SOLARIS NON-GLOBAL ZONE',
-    'SOLARIS FRAME DOMAIN',
-    'RACK ENCLOSURES'
-)
-AND (
-    ([status] <> 'Retired')
-    OR
-    ([status] = 'Retired' AND [LastUpdateDate] > GETDATE() - 90)
-)
-AND (
-    [Manufacturer] IS NULL OR [Manufacturer] <> 'Software House'
-)
-----------------------------------------------------------------------------
-vz_servers_SAM_delta: Data source
-SQL Statement:
-SELECT [assetid]
-      ,[source]
-      ,[devicename]
-      ,[physical_virtual]
-      ,[fqdn]
-      ,[status]
-      ,[manufacturer]
-      ,[serialnumber]
-      ,[decommissionDate]
-      ,[cpucount]
-      ,[corecount]
-      ,[cpuspeed]
-      ,[os]
-      ,[osversion]
-      ,[Environment]
-      ,[businessunit]
-      ,[assetsupportlevel]
-      ,[discovery_source]
-      ,[model_id]
-      ,[app]
-      ,[BC]
-      ,[custodianeid]
-      ,[DirectorEID]
-      ,[appl_ref]
-      ,[ostype]
-      ,[locationcode]
-      ,[LastUpdateDate]
-  FROM [ServiceNow].[SAM]
-WHERE ([Type] <> 'IMAGING/VIDEO DEVICES' OR [Type] IS NULL) AND ([Manufacturer] IS NULL OR [Manufacturer] <> 'Software House')
+For each set by Name:
 
-2) the SAM data source vz_servers_SAM_delta is filtered to only bring in the list of Type values in the description & where status is not retired
+2. Primary Record
+- Identify primary record as last touched [most recent Updated time stamp]
 
-Answer:
+3. Reference to Task
+- All other records, identify if referenced on key table TASK_CI or TASK
+- IF reference exists, need to update to sys_id of primary record
 
-SELECT [assetid]
-      ,[source]
-      ,[devicename]
-      ,[physical_virtual]
-      ,[fqdn]
-      ,[status]
-      ,[manufacturer]
-      ,[serialnumber]
-      ,[decommissionDate]
-      ,[cpucount]
-      ,[corecount]
-      ,[cpuspeed]
-      ,[os]
-      ,[osversion]
-      ,[Environment]
-      ,[businessunit]
-      ,[assetsupportlevel]
-      ,[discovery_source]
-      ,[model_id]
-      ,[app]
-      ,[BC]
-      ,[custodianeid]
-      ,[DirectorEID]
-      ,[appl_ref]
-      ,[ostype]
-      ,[locationcode]
-      ,[LastUpdateDate]
-      ,[Type]
-FROM [ServiceNow].[SAM]
-WHERE [Type] IN (
-    'SERVERS',
-    'VIRTUAL GUEST',
-    'VIRTUAL MACHINE',
-    'VMWARE ESX SERVER',
-    'BLADE ENCLOSURES',
-    'SOLARIS GLOBAL ZONE',
-    'SOLARIS LDOM',
-    'SOLARIS NON-GLOBAL ZONE',
-    'SOLARIS FRAME DOMAIN',
-    'RACK ENCLOSURES'
-)
-AND [status] <> 'Retired'
-AND ([Manufacturer] IS NULL OR [Manufacturer] <> 'Software House')
+4. Mark for deletion
+- Mark duplicate record by setting attribute column to: DELETE
+- Existing Table Cleaner job will remove duplicate record
 
