@@ -44,5 +44,7 @@ records which found in step 1.
 gr.setWorkflow(false);
 gr.autoSysFields(false);
 
+4. Since there is a lot of duplicate rcords in the cmdb_ci_server table instead of fix script we have to go for an approach like an schedule job
+to delete and update the primary record value in the task_ci table batch wise, schedule job needs to be run every hour
 
 
