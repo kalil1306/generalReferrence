@@ -47,4 +47,87 @@ gr.autoSysFields(false);
 4. Since there is a lot of duplicate rcords in the cmdb_ci_server table instead of fix script we have to go for an approach like an schedule job
 to delete and update the primary record value in the task_ci table batch wise, schedule job needs to be run every hour
 
+Answer:
+
+(function executeRule() {
+    var nameToPrimary = {};
+    var batchSize = 100;
+    var count = 0;
+    var duplicatesProcessed = 0;
+
+    gs.info('[CMDB Cleanup Job] Starting duplicate cleanup job...');
+
+    try {
+        // Step 1: Query all relevant cmdb_ci_server records
+        var serverGR = new GlideRecord('cmdb_ci_server');
+        serverGR.addEncodedQuery(
+            'discovery_source=ITAM^sys_class_nameINcmdb_ci_aix_server,cmdb_ci_esx_server,cmdb_ci_hpux_server,cmdb_ci_linux_server,cmdb_ci_server,cmdb_ci_solaris_server,cmdb_ci_win_server'
+        );
+        serverGR.orderBy('name');
+        serverGR.orderByDesc('sys_updated_on');
+        serverGR.query();
+
+        while (serverGR.next() && count < batchSize) {
+            try {
+                var name = serverGR.name.toString();
+
+                if (!name) {
+                    gs.warn('[CMDB Cleanup Job] Skipping record with missing name. sys_id: ' + serverGR.sys_id);
+                    continue;
+                }
+
+                if (!nameToPrimary[name]) {
+                    nameToPrimary[name] = serverGR.sys_id.toString();
+                    gs.info('[CMDB Cleanup Job] Primary record for "' + name + '": ' + serverGR.sys_id);
+                    continue;
+                }
+
+                var duplicateSysId = serverGR.sys_id.toString();
+                var primarySysId = nameToPrimary[name];
+                gs.info('[CMDB Cleanup Job] Found duplicate for "' + name + '" — Duplicate: ' + duplicateSysId + ' | Primary: ' + primarySysId);
+
+                // Step 2: Update task_ci references
+                try {
+                    var taskCiGR = new GlideRecord('task_ci');
+                    taskCiGR.addQuery('ci_item', duplicateSysId);
+                    taskCiGR.query();
+                    while (taskCiGR.next()) {
+                        try {
+                            var taskSysId = taskCiGR.sys_id.toString();
+                            taskCiGR.setWorkflow(false);
+                            taskCiGR.autoSysFields(false);
+                            taskCiGR.ci_item = primarySysId;
+                            taskCiGR.update();
+                            gs.info('[CMDB Cleanup Job] task_ci record updated: ' + taskSysId + ' | Old CI: ' + duplicateSysId + ' => New CI: ' + primarySysId);
+                        } catch (taskErr) {
+                            gs.error('[CMDB Cleanup Job] Error updating task_ci ' + taskCiGR.sys_id + ': ' + taskErr.message);
+                        }
+                    }
+                } catch (taskQueryErr) {
+                    gs.error('[CMDB Cleanup Job] Error querying task_ci for duplicate CI ' + duplicateSysId + ': ' + taskQueryErr.message);
+                }
+
+                // Step 3: Mark the duplicate for deletion
+                try {
+                    serverGR.setWorkflow(false);
+                    serverGR.autoSysFields(false);
+                    serverGR.attributes = 'DELETE';
+                    serverGR.update();
+                    gs.info('[CMDB Cleanup Job] Marked cmdb_ci_server ' + duplicateSysId + ' with attributes = DELETE');
+                } catch (updateErr) {
+                    gs.error('[CMDB Cleanup Job] Error marking CI ' + duplicateSysId + ' for deletion: ' + updateErr.message);
+                }
+
+                count++;
+                duplicatesProcessed++;
+            } catch (recordErr) {
+                gs.error('[CMDB Cleanup Job] Error processing record sys_id ' + serverGR.sys_id + ': ' + recordErr.message);
+            }
+        }
+
+        gs.info('[CMDB Cleanup Job] Cleanup complete. Duplicates processed: ' + duplicatesProcessed);
+    } catch (globalErr) {
+        gs.error('[CMDB Cleanup Job] Fatal error: ' + globalErr.message);
+    }
+})();
 
