@@ -127,3 +127,78 @@ errors:
 -----------------------------------------------------------------------
 
 https://www.servicenow.com/community/developer-forum/createorupdateci-failed-import-set-error/m-p/2798210#M1074596
+
+--------------------------------------------------------
+
+
+executeRule();
+
+
+function executeRule() {
+
+    var nameToPrimary = {};
+    var batchSize = 100;
+    var count = 0;
+    var duplicateProcessed = 0;
+
+    //gs.info('[CMDB Cleanup Job] Deduplicate Servers & Update Task References::: Starting duplicate cleanup job...');
+
+    try {
+        //Get the all relevant server records
+        var query = 'discovery_source=ITAM^sys_class_nameINcmdb_ci_aix_server,cmdb_ci_esx_server,cmdb_ci_hpux_server,cmdb_ci_linux_server,cmdb_ci_server,cmdb_ci_solaris_server,cmdb_ci_win_server^attributes!=DELETE^ORattributesISEMPTY';
+        var serverGr = new GlideRecord('cmdb_ci_server');
+        serverGr.addEncodedQuery(query);
+        serverGr.orderBy('name');
+        serverGr.orderByDesc('sys_updated_on');
+        //serverGr.setLimit(batchSize);
+        serverGr.query();
+
+        while (serverGr.next() && count < batchSize) {
+
+            var name = serverGr.name.toString();
+
+            //Go to the next iteration if the name is empty
+            if (!name) {
+                continue;
+            }
+
+            //Go to the next iterations if the primary server ia found and appened in the object
+            if (!nameToPrimary[name]) {
+                nameToPrimary[name] = serverGr.sys_id.toString();
+                //gs.info('ARK:::[CMDB Cleanup Job] Primary record for "' + name + '": ' + serverGr.sys_id);
+                continue;
+            }
+
+            var duplicateSysId = serverGr.sys_id.toString();
+            var primarySysId = nameToPrimary[name];
+
+            // update task_ci references by finding the duplicates CI's and updating with primmary CI server
+            var taskCiGr = new GlideRecord('task_ci');
+            taskCiGr.addQuery('ci_item', duplicateSysId);
+            taskCiGr.query();
+            while (taskCiGr.next()) {
+                var taskSysId = taskCiGr.sys_id.toString();
+                taskCiGr.setWorkflow(false);
+                taskCiGr.autoSysFields(false);
+                taskCiGr.ci_item = primarySysId;
+                taskCiGr.update();
+            }
+
+            //Mark the duplicate for the deletion in the attributes column
+            serverGr.setWorkflow(false);
+            serverGr.autoSysFields(false);
+            serverGr.attributes = 'DELETE';
+            serverGr.update();
+
+            //Increase the count value to update the record in batch wise
+            count++;
+            duplicateProcessed++;
+        }
+        gs.info('ARK:::[CMDB Cleanup Job] Cleanup complete. Duplicates processed: ' + duplicateProcessed);
+
+
+    } catch (globalErr) {
+        gs.error('[CMDB Cleanup] Deduplicate Servers & Update Task References.Fatal error: ' + globalErr.message);
+
+    }
+}
