@@ -202,3 +202,60 @@ function executeRule() {
 
     }
 }
+--------------------------------------------------------------------------
+
+Ram's story:
+
+SELECT [assetid]
+      ,[source]
+      ,[devicename]
+      ,[physical_virtual]
+      ,[fqdn]
+      ,[status]
+      ,[manufacturer]
+      ,[serialnumber]
+      ,[decommissionDate]
+      ,[cpucount]
+      ,[corecount]
+      ,[cpuspeed]
+      ,[os]
+      ,[osversion]
+      ,[Environment]
+      ,[businessunit]
+      ,[assetsupportlevel]
+      ,[discovery_source]
+      ,[model_id]
+      ,[app]
+      ,[BC]
+      ,[custodianeid]
+      ,[DirectorEID]
+      ,[appl_ref]
+      ,[ostype]
+      ,[locationcode]
+      ,[LastUpdateDate]
+      ,[Type]
+FROM [ServiceNow].[SAM]
+WHERE [Type] IN (
+    'SERVERS',
+    'VIRTUAL GUEST',
+    'VIRTUAL MACHINE',
+    'VMWARE ESX SERVER',
+    'BLADE ENCLOSURES',
+    'SOLARIS GLOBAL ZONE',
+    'SOLARIS LDOM',
+    'SOLARIS NON-GLOBAL ZONE',
+    'SOLARIS FRAME DOMAIN',
+    'RACK ENCLOSURES'
+)
+AND (
+    ([status] <> 'Retired')
+    OR
+    ([status] = 'Retired' AND [LastUpdateDate] > GETDATE() - 90)
+)
+AND (
+    [Manufacturer] IS NULL OR [Manufacturer] <> 'Software House'
+)
+
+In this SQL statement remove the line ([status] = 'Retired' AND [LastUpdateDate] > GETDATE() - 90) and give me the correct SQL statement
+
+
