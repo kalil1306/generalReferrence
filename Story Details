@@ -203,6 +203,24 @@ function executeRule() {
     }
 }
 --------------------------------------------------------------------------
+STRY1018363 : 
+
+Create a new data source for Casino load balance services and transform map to load the data in to the target table cmdb_ci_endpoint_http.
+Give me the perfect name for the data source and transform map, and a new import set table and how it will get created from the data source.
+
+Requirement for creating the transform map
+CSV file has 4 columns:
+
+entrypoint_fqdn
+load_balancer_hostname
+vastid
+last_refreshed_dt
+
+Mapping to use for HTTP(S) Endpoint [cmdb_ci_endpoint_http].  Coalesce on URL.
+
+Install Status - default '1' (Installed)
+URL - entrypoint_fqdn
+Most Recent Discovery [last_discovered] - pull Date value from 'last_refreshed_dt' - incoming format example is: 2025-04-30T14:00:06.885000+00:00
 
 
 
