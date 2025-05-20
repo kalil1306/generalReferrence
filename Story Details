@@ -223,4 +223,26 @@ URL - entrypoint_fqdn
 Most Recent Discovery [last_discovered] - pull Date value from 'last_refreshed_dt' - incoming format example is: 2025-04-30T14:00:06.885000+00:00
 
 
+Answer:
+
+if (source.last_refreshed_dt) {
+  // Get the raw string from the CSV (example: 2025-04-30T14:00:06.885000+00:00)
+  var raw = source.last_refreshed_dt.toString();
+
+  // Step 1: Remove the microseconds (.885000) using a regular expression
+  var noMicroseconds = raw.replace(/\.\d+/, '');  
+  // Result: "2025-04-30T14:00:06+00:00"
+
+  // Step 2: Remove the timezone offset (+00:00) using another regex
+  var cleaned = noMicroseconds.replace(/(\+|\-)\d{2}:\d{2}$/, '');  
+  // Result: "2025-04-30T14:00:06"
+
+  // Step 3: Create a GlideDateTime object from the cleaned string
+  var gdt = new GlideDateTime(cleaned);  
+
+  // Step 4: Assign it to the target field
+  target.last_discovered = gdt;
+}
+
+
 
