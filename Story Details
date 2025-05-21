@@ -244,5 +244,55 @@ if (source.last_refreshed_dt) {
   target.last_discovered = gdt;
 }
 
+---------------------------------------------
+
+How to test the database indexes in the cmdb_rel_ci table
+
+Here’s a GlideRecord test script to evaluate all three indexes on the cmdb_rel_ci table: parent, type, child, type, and child, parent, type, port.
+
+You can run this in Scripts - Background:
+
+// Test Index 1: parent, type
+gs.info('--- Testing index: parent, type ---');
+var gr1 = new GlideRecord('cmdb_rel_ci');
+gr1.addQuery('parent', 'PUT_PARENT_SYS_ID_HERE');  // replace with actual sys_id
+gr1.addQuery('type', 'PUT_TYPE_SYS_ID_HERE');      // replace with actual sys_id
+gr1.query();
+while (gr1.next()) {
+    gs.info('Match (parent, type): ' + gr1.sys_id);
+}
+
+// Test Index 2: child, type
+gs.info('--- Testing index: child, type ---');
+var gr2 = new GlideRecord('cmdb_rel_ci');
+gr2.addQuery('child', 'PUT_CHILD_SYS_ID_HERE');    // replace with actual sys_id
+gr2.addQuery('type', 'PUT_TYPE_SYS_ID_HERE');      // same type or different
+gr2.query();
+while (gr2.next()) {
+    gs.info('Match (child, type): ' + gr2.sys_id);
+}
+
+// Test Index 3: child, parent, type, port
+gs.info('--- Testing index: child, parent, type, port ---');
+var gr3 = new GlideRecord('cmdb_rel_ci');
+gr3.addQuery('child', 'PUT_CHILD_SYS_ID_HERE');    // replace with actual sys_id
+gr3.addQuery('parent', 'PUT_PARENT_SYS_ID_HERE');  // replace with actual sys_id
+gr3.addQuery('type', 'PUT_TYPE_SYS_ID_HERE');      // replace with actual sys_id
+gr3.addQuery('port', 'PUT_PORT_VALUE_HERE');       // replace with actual port value
+gr3.query();
+while (gr3.next()) {
+    gs.info('Match (child, parent, type, port): ' + gr3.sys_id);
+}
+
+
+✅ Optional Debugging:
+
+Before running the script, enable Debug SQL:
+	1.	Navigate to System Diagnostics > Session Debug.
+	2.	Click Debug SQL ON.
+	3.	Then run the script and view logs under System Logs > SQL Logs to confirm which index was used.
+
+
+
 
 
