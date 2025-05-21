@@ -292,6 +292,27 @@ Before running the script, enable Debug SQL:
 	2.	Click Debug SQL ON.
 	3.	Then run the script and view logs under System Logs > SQL Logs to confirm which index was used.
 
+--------------------------------------------------------------------------------------------------
+
+Spike story: STRY1018309
+
+Use case:
+Import Set "STRY1018309_LoadBalancer_IH-ETL" has the creation of an IntegrationHub ETL job that reads the format of data from Casino to ingest Load Balancer CIs across multiple CI Classes.
+
+This story is to automate the Load Balancer by changing the Scheduled Import 'Casino Load Balancer' from a One-Time load of an attached CSV file, to process daily (10am) by connecting to the Casino API to retrieve the payload as a CSV formatted file.
+
+Technical design element:
+
+Information for Casino API - The Casino API has to be authenticated (Service Account PW can be sent via secure email by Marshall) to use a token to retrieve data. Attached is a how-to guide from Eric Gu on the Casino team.
+
+API URL:  https://network-api.casino-services.verizon.com/
+UAT:          https://network-api.casino-services-uat.ebiz.verizon.com/
+DEV:         https://network-api.casino-services-dev.ebiz.verizon.com/
+SERVICE ACCOUNT:  svc-snow-cmdb-casino
+DOMAIN:                     us-win 
+
+
+
 
 
 
