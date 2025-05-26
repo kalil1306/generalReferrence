@@ -311,6 +311,15 @@ DEV:         https://network-api.casino-services-dev.ebiz.verizon.com/
 SERVICE ACCOUNT:  svc-snow-cmdb-casino
 DOMAIN:                     us-win 
 
+Request:
+This story is to automate the Load Balancer by changing the Scheduled Import 'Casino Load Balancer' from a One-Time load of an attached CSV file, to process daily (10am) by connecting to the Casino API to retrieve the payload as a CSV formatted file.
+
+Analysis:
+The documentation received on how to access network api references curl or python call.  Majority of the time spent in this sprint was done to turn it into a REST call, check to establish the connection and pull the data.  No major blockers were encountered with any firewall or connection issues.   A REST message and a REST flow action are created to test the connection.  The REST action is able to pull back a .csv file and attach it to the data source.
+More research is needed to work the REST API connection into integration hub, explore the rest integration type on data source, the use of robust transform maps, error handling and use of data stream to determine the best approach.
+
+Go Forward Plan:
+Another 8 point story is needed to research more on this spike.
 
 
 
