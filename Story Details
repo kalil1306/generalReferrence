@@ -321,8 +321,160 @@ More research is needed to work the REST API connection into integration hub, ex
 Go Forward Plan:
 Another 8 point story is needed to research more on this spike.
 
+-----------------------------------------------------------------------------------------------------------------------------
+
+STRY1007797 - Populate WS1 Application Bundle Id in AYS
+
+Analysis:
+Scripted REST service:
+Software_WS!_Integrations
+
+resources:
+update_ws1_softwareApps - HTTP method is POST
+
+resource path URL: /api/verw2/software_ws1_integration/update_ws1_softwareApps
+
+script operations:
+
+(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+
+    var responseObj = {};
+	var messageCode = "";
+	var messageText = "";
+	var hasException = false;
+	var exceptionIs = "";
+	var status = 500;
+
+	try{
+		var mandFields = [];
+		var missingFields = [];
+		var missing = false;
+
+		var requestBody = request.body;
+		var requestString = requestBody.dataString;
+		var parsed = JSON.parse(requestString);
+		
+		var name = parsed.name; 
+		if(name==undefined)
+		{
+			missing=true; 
+			missingFields.push("name");
+		} 
+		mandFields.push("name", name);
+		
+		var version = parsed.version; 
+		if(version==undefined)
+		{
+			missing=true; 
+			missingFields.push("version");
+		} 
+		mandFields.push("version", version);
+		
+		var developer = parsed.developer; 
+		if(developer==undefined)
+		{
+			missing=true; 
+			missingFields.push("developer");
+		} 
+		mandFields.push("developer", developer);
+		
+		var devicetypeID = parsed.devicetypeID;
+		if(devicetypeID==undefined)
+		{
+			missing=true; 
+			missingFields.push("devicetypeID");
+		} 
+		mandFields.push("devicetypeID", devicetypeID);
+		
+		var applicationID = parsed.applicationID;
+		if(applicationID ==undefined)
+		{
+			missing=true; 
+			missingFields.push("applicationID");
+		} 
+		mandFields.push("applicationID", applicationID);
+		
+		if(this._checkMandatoryFields(mandFields, missingFields) && missing==false )
+		{
+			var rec = new GlideRecord("u_ws1_apps");
+			rec.addQuery('u_app_id',applicationID);
+			rec.query();
+			if(rec.next())
+				{
+					status = 400;
+					messageCode = "Operation Failure";
+					messageText = "WorkspaceOne application already exists.";
+				}
+			else
+				{
+					rec.initialize();
+					rec.u_name= name;
+					rec.u_version = version;
+					rec.u_manufacturer = developer;
+					rec.u_platform = devicetypeID;
+					rec.u_app_id = applicationID;
+					if(rec.insert())
+					{
+						status = 200;
+						messageCode = "Operation Success";
+						messageText = "Successful creation of WorkspaceOne application.";
+					}
+					else
+					{
+						status = 401;
+						messageCode = "Operation Failure";
+						messageText = "Unable to create WorkspaceOne application.";
+					}
+				}
+		}
+		else
+			{
+				status = 401;
+				messageCode = "Operation Failed";
+				messageText = "Missing Mandatory Fields";
+			}
+	}
+
+	catch(err)
+	{
+		messageCode = "Operation Failed";
+		messageText = "Unable to create WorkspaceOne application.";
+		hasException = true;
+		exceptionIs = err.toString();
+	}
+
+	response.setStatus(status);
+	responseObj = {
+		"MessageCode": messageCode,
+		"MessageText": messageText,
+		"HasException": hasException,
+		"Exception": exceptionIs
+	};
+	response.setBody(responseObj);
+})(request, response);
+
+function _checkMandatoryFields(mandFields, missingFields){
+	var isAllClear = true;
+	for(var i = 1; i < mandFields.length; i++){
+		if(mandFields[i] == ""){
+			isAllClear = false;
+			missingFields.push(mandFields[i-1]);
+		}i++;
+	}
+	return isAllClear;
+}
 
 
+Request body example:
+{
+"name":".NET Core  Runtime & Hosting Bundle",
+"version":"2.2.4",
+"devicetypeID":"Windows",
+"developer":"Microsoft",
+"applicationID":"1"
+}
 
+
+table is u-ws1_apps and the field needs to be added is u_bundle_id to be added in the above script
 
 
