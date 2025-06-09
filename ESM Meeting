@@ -1,0 +1,24 @@
+June 10 2025:
+
+load balance service:
+
+In ServiceNow, Load Balancer Services refer to the configuration and management of service endpoints that are designed to distribute traffic across multiple application nodes or mid servers for better availability, scalability, and fault tolerance.
+
+Here’s a breakdown of how it works in the ServiceNow context:
+
+⸻
+
+🔁 Core Idea of Load Balancer in ServiceNow
+
+ServiceNow is a cloud platform and is built on a multi-node architecture. A load balancer sits in front of these nodes and routes incoming user requests (like logins, API calls, integrations) to the most appropriate node.
+-------------------------------------
+
+
+
+
+
+
+
+
+
+
