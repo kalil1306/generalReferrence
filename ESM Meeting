@@ -163,6 +163,82 @@ function executeRule() {
 }
 
 
+-------------------------------------------------------------------
+
+An index is like a shortcut in a database that helps ServiceNow quickly find records without scanning the entire table. This is especially critical for large tables like cmdb_rel_ci, which can have millions of rows.
+
+Without an index, ServiceNow will do a full table scan, which is slow and resource-heavy.
+
+
+During the Yokohama upgrade, if these indexes are created on-the-fly:
+	•	The database engine needs to scan all rows to build the index
+	•	Example: For 202 million rows, index creation took 3 hours 20 minutes
+	•	This increases upgrade window duration and delays go-live
+
+
+🧩 Summary Talking Points for Director
+	•	ServiceNow recommends adding 3 compound indexes on cmdb_rel_ci table.
+	•	This improves performance for critical modules like CMDB, Service Mapping, Reports, and APIs.
+	•	Without these indexes, large-scale data queries can cause slowness and degrade user experience.
+	•	Applying them before the Yokohama upgrade avoids long upgrade windows.
+	•	This aligns with ServiceNow best practices (KB1703367), especially for high-volume CMDB environments.
+
+
+-------------------------------
+
+To clean up duplicate server records (from ITAM source) in the CMDB, ensuring data accuracy, and paving the way for reliable Discovery and Service Mapping in a mature CMDB model.
+
+⸻
+
+🧩 Why This is Important
+
+Duplicate CI records (Configuration Items) in CMDB:
+	•	Lead to confusion in incident/change/problem records
+	•	Cause inaccurate dependency maps in Service Mapping
+	•	Increase maintenance effort and inconsistency across modules
+	•	Block reconciliation and normalization for Discovery and ITOM
+
+This effort prepares the CMDB for clean ingestion from ServiceNow Discovery by removing ITAM-based duplicates.
+
+
+🔁 End-to-End Flow Summary
+
+Step
+Description
+Outcome
+1️⃣
+Identify duplicates by name, filtered by class and source
+Clean target scope
+2️⃣
+Pick primary (most recent update)
+Establish reliable record
+3️⃣
+Update all task references to primary
+Avoid broken links in ITSM
+4️⃣
+Set attribute = DELETE for duplicates
+Mark for safe removal
+🔁
+Table Cleaner removes them
+Final cleanup
+
+
+✅ Ready-to-Use Talking Points for Director
+	•	We’re eliminating duplicate ITAM servers to stabilize the CMDB and prepare for Discovery integration.
+	•	This improves data quality, reduces incident misrouting, and aligns with CMDB governance.
+	•	We’re ensuring referential integrity before deletion — no impact on task history.
+	•	Duplicate CIs are only flagged, and deleted later using the Table Cleaner job (standard platform feature).
+	•	This supports our ITOM roadmap and data compliance efforts.
+
+
+
+
+
+
+
+
+
+
 
 
 
