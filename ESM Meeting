@@ -1,17 +1,94 @@
 June 10 2025:
 
-load balance service:
+EPIC0021404 - Update index on cmdb_rel_ci (ServiceNow Recommendation KB1703367)
 
-In ServiceNow, Load Balancer Services refer to the configuration and management of service endpoints that are designed to distribute traffic across multiple application nodes or mid servers for better availability, scalability, and fault tolerance.
+KB1703367
 
-Here’s a breakdown of how it works in the ServiceNow context:
+Servicenow Index:
 
-⸻
+A database index is a short cut way that helps the system find rows faster when the table is queried/filtered.
 
-🔁 Core Idea of Load Balancer in ServiceNow
+What happens if the index is not being used?
+ServiceNow will take an approach to scan every row in the table called table scan - especially for big tables like CI relationship table
 
-ServiceNow is a cloud platform and is built on a multi-node architecture. A load balancer sits in front of these nodes and routes incoming user requests (like logins, API calls, integrations) to the most appropriate node.
--------------------------------------
+What they do?
+Speed up queries in GLideRecord, filters, reports or in list views
+Improve performance on scripts,business rules and API’s
+Help with joins in complex reports or service mapping
+Reports - basically used to calculate metrics to show in dashboards
+Service Mappings - mapping the application dependencies in the CMDB
+
+Why in complex reports?
+To pull related information from CI’s, CI relationship and tickets
+
+Why in service mapping?
+To find and visualize all dependant CI’s in a service(Service Configuration Item Associations related with Application service table)
+
+What was changed?
+
+On upgrade to Yokohoma, three new compound indexes are added to cmdb_rel_ci table 
+1) parent, type
+2) child, type
+3) child, parent, type, port
+
+What is the impact?
+
+Initial upgrade testing conducted on an instance populated with 202 million cmdb_ci records has provided concrete evidence of this issue. The process of creating all necessary indexes on such a large dataset was observed to take approximately 3 hours and 20 minutes. This lengthy duration highlights the potential for extended upgrade windows and the need for optimization strategies to mitigate the impact on customer operations.
+
+Why did upgrade time increase?
+Database engine needs to scan and rebuild the index across all rows and this is going to be resource intensive and takes time, so the upgrade waits until the operation completes
+
+Before upgrade applying the index script it is going to reduce the time Yokohoma upgrade time
+
+Demo:
+// Test Index 2: child, type
+gs.info('--- Testing index: child, type ---');
+
+var start = new Date().getTime();
+
+var gr2 = new GlideRecord('cmdb_rel_ci');
+gr2.addQuery('child', 'fc631c2c97e12ed0826673f11153aff4'); // replace with actual sys_id
+gr2.addQuery('type', '41008aa6ef32010098d5925495c0fb94'); // same type or different
+gr2.query();
+while (gr2.next()) {
+    //gs.info('Match (child, type): ' + gr2.sys_id);
+}
+
+var end = new Date().getTime();
+gs.info('Query duration (ms): ' + (end - start));
+
+//child=fc631c2c97e12ed0826673f11153aff4^type=41008aa6ef32010098d5925495c0fb94
+
+Interpretations:
+Fast (< 100 ms) on large data → Index used 
+Slow (> 100 ms) or keep growing with the record count → Index not used
+------------------------------------------------------------------------------------------------------------------------------------------
+
+EPIC0021334 - Remove duplicate ITAM servers by name
+To allow for a mature CMDB including ServiceNow Discovery, the ITAM source should be processing unique server records by name. Next step to prepare for this is to remove the duplicate servers by name from existing CMDB tables.
+
+To achieve this created a script
+
+1. Identification
+- Discovery Source = ITAM
+- Class is Server but NOT IBM Mainframe, IBM Mainframe LPAR, IBM Mainframe Linux, Server Chassis
+    (Class Is: AIX Server, ESX Server, HPUX Server, Linux Server, Server, Solaris Server, Windows Server)
+- More than 1 record by Name
+
+For each set by Name:
+
+2. Primary Record
+- Identify primary record as last touched [most recent Updated time stamp]
+
+3. Reference to Task
+- All other records, identify if referenced on key table TASK_CI or TASK
+- IF reference exists, need to update to sys_id of primary record
+
+4. Mark for deletion
+- Mark duplicate record by setting attribute column to: DELETE
+- Table Cleaner job will remove duplicate record
+
+
 
 
 
