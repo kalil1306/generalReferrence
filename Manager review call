@@ -27,6 +27,51 @@ Contributed to platform performance improvements by removing unnecessary log sta
 	3.	Continuous Upskilling:
 Actively upskilling in ECMAScript to enhance development capabilities and exploring its practical application in day-to-day work. Staying curious and engaged with new ServiceNow features and releases to support broader platform initiatives.
 
-
 culture:
+
+Making myself available during RTO days for better team engagement and colloborations
+actively participating in Gusto events, All hands 
+completed the AI Search: Explore AI Search with a Hands-on Lab and ITOM overview
+Continuously giving myself for continuous learning on ITAM (SAM) for our principle showed on ESM PI planning
+continuously sharing my needs and feedback with manager
+
+--------------------------------------------------
+
+Effectiveness:
+
+DocIntel(Document Intelligence (DocIntel) is an AI solution that enables any organization to automate and accelerate the process of extracting data from documents) currently in Asset WUE form we are getting document(pdf) file with some data that can be process with more and easy way to extract it populate on the worknotes
+
+-------------------------------------------------------
+
+Efficyency:
+
+Completed Discovery course on Demand and make use of these skills in our upcoming implementation on disvovery for maturing the cmdb
+
+To clean up duplicate server records and avoid selecting duplicate CI's (from ITAM source) in the CMDB created an automated script which runs daily till it clears up all the duplicate servers, ensuring data accuracy, and paving the way for reliable Discovery and Service Mapping in a mature CMDB model.
+
+------------------------------------------------------------------
+Experience:
+
+
+Timesheet compliance using correct codes and timely completion (Friday Morning) 100% compliance 
+ Mandatory Training compliance with 0% deviation 
+ Phishing compliance - decreased myself from 2 clicker to one clicker and also taken session phising mail awareness to the team to save themself by clicking
+Participate and be vocal in VZ pulse action item discussions.
+
+
+----------------------------------------------
+
+Operation excellence:
+
+understand and delievered related to scrum ceremonies task with full of awareness based on the business priorities, onboarded 15 principal classes
+onboarded 15 principal class till now, still it is in progress and there is regular scheduled import has been placed for the data source to update the ci regualarly to reduce the staleness and if the ci is not updated for certain days then it will get outdated there is an automation script is created by me which will take care of the ci
+
+----------------------------------------------------
+process excellence:
+
+actively participating in scrum ceremonies, communicating with onshore team as well as business stakeholders whenever it requires for their EPIC's, participating PI planning for get to know that upcoming scrum team plan's.
+
+--------------------------------------------------
+
+
 
