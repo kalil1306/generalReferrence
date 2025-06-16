@@ -35,11 +35,27 @@ completed the AI Search: Explore AI Search with a Hands-on Lab and ITOM overview
 Continuously giving myself for continuous learning on ITAM (SAM) for our principle showed on ESM PI planning
 continuously sharing my needs and feedback with manager
 
+
+
+1.	Team Engagement & Collaboration:
+Consistently made myself available during RTO days to strengthen team bonding and in-person collaboration. Actively participated in Gusto events and All Hands sessions to stay connected with the broader team and company culture.
+	2.	Learning & Growth Mindset:
+Completed key enablements like AI Search: Explore AI Search with a Hands-on Lab and ITOM Overview to deepen platform knowledge. Also committed to continuous learning in ITAM (SAM), aligning with our ESM PI planning priorities.
+	3.	Open Communication & Feedback:
+Proactively shared feedback and development needs with my manager to support mutual growth and ensure alignment with team and organizational goals.
+
+
+
 --------------------------------------------------
 
 Effectiveness:
 
 DocIntel(Document Intelligence (DocIntel) is an AI solution that enables any organization to automate and accelerate the process of extracting data from documents) currently in Asset WUE form we are getting document(pdf) file with some data that can be process with more and easy way to extract it populate on the worknotes
+
+
+Exploring Document Intelligence (DocIntel) Integration for Asset WUE Form Processing:
+Currently evaluating ServiceNow Document Intelligence (DocIntel) to automate data extraction from PDF documents uploaded through the Asset WUE form. The goal is to streamline the process by using AI to extract relevant data points and populate them directly into work notes, reducing manual input and improving accuracy. This initiative is expected to enhance efficiency in asset processing once fully implemented.
+
 
 -------------------------------------------------------
 
@@ -48,6 +64,11 @@ Efficyency:
 Completed Discovery course on Demand and make use of these skills in our upcoming implementation on disvovery for maturing the cmdb
 
 To clean up duplicate server records and avoid selecting duplicate CI's (from ITAM source) in the CMDB created an automated script which runs daily till it clears up all the duplicate servers, ensuring data accuracy, and paving the way for reliable Discovery and Service Mapping in a mature CMDB model.
+
+
+Successfully completed the Discovery on Demand course to build foundational expertise in Discovery and prepare for our upcoming implementation aimed at maturing the CMDB. In parallel, developed and deployed an automated daily script to identify and clean up duplicate server records in the CMDB, particularly those originating from ITAM sources. This initiative ensures improved data accuracy, eliminates the risk of selecting duplicate CIs, and lays a strong foundation for reliable Discovery and Service Mapping within a mature CMDB architecture.
+
+
 
 ------------------------------------------------------------------
 Experience:
@@ -59,6 +80,8 @@ Timesheet compliance using correct codes and timely completion (Friday Morning) 
 Participate and be vocal in VZ pulse action item discussions.
 
 
+Demonstrated strong operational discipline by maintaining 100% timesheet and training compliance, improving personal phishing awareness, conducting a team session on phishing prevention, and actively contributing to VZ Pulse action item discussions.
+
 ----------------------------------------------
 
 Operation excellence:
@@ -66,10 +89,19 @@ Operation excellence:
 understand and delievered related to scrum ceremonies task with full of awareness based on the business priorities, onboarded 15 principal classes
 onboarded 15 principal class till now, still it is in progress and there is regular scheduled import has been placed for the data source to update the ci regualarly to reduce the staleness and if the ci is not updated for certain days then it will get outdated there is an automation script is created by me which will take care of the ci
 
+
+
+Effectively delivered on Scrum ceremony responsibilities with strong awareness of business priorities. Successfully onboarded 15 Principal Classes to date (with more in progress), and implemented a scheduled import process to regularly update CI data from the data source—helping reduce data staleness. Additionally, developed an automation script to flag and mark CIs as outdated if not refreshed within a defined period, ensuring CMDB remains accurate and reliable for downstream processes like Discovery and Service Mapping.
+
+
 ----------------------------------------------------
 process excellence:
 
 actively participating in scrum ceremonies, communicating with onshore team as well as business stakeholders whenever it requires for their EPIC's, participating PI planning for get to know that upcoming scrum team plan's.
+
+
+Actively participated in all Scrum ceremonies, maintaining clear and timely communication with the onshore team and business stakeholders to support the progress of their EPICs. Also engaged in PI Planning sessions to stay aligned with upcoming sprint goals, team priorities, and cross-functional planning activities.
+
 
 --------------------------------------------------
 
