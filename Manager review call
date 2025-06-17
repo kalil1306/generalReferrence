@@ -105,5 +105,22 @@ Actively participated in all Scrum ceremonies, maintaining clear and timely comm
 
 --------------------------------------------------
 
+Accomplishment:
+
+COmpleted Discovery fundamentals on demand course, Iam very curious to learn this personally how this works and also in ESM PI planning this is gonna be one of the 5 principles that we are going to dive init for maturing the CMDB
+-----------------------------------------------------------------------------
+
+EPIC0021413 - To improve the quality of the CMDB, a list of Load Balancer CIs should be imported from the Casino source system.
+
+previously load balancer and it's relationship was done by the manual csv file type data source to transform the data to Http(s) endpoint table and lb table, now I have did to automate the this process from manual to automation
+in the way of flow action using rest message step with the help of POST and GET call to retrive the csv file and attach it on data source
+--------------------------------------------------------------------------
+
+EPIC0021048 - To enhance application install completion, the Application Bundle ID needs to be added to the control table u_ws1_apps and available to be written with the API call that WS1 calls to update the list of applications.
+-----------------------------------------------------------------------
+EPIC0021338 - Create ICONIC Information Object and relationships to Business Applications(Iconic - Suite of applications identified in VAST as ICONIC, creates a list of business applications essential to sales and billing for consumer devices. The most critical application suite within Verizon.)
+
+created the relationship, between the VAST ci and its business child CI by fetching only the iconic ci using the SQL sstatement in JDBC data source
+-------------------------------------------------------------
 
 
