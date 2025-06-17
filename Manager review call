@@ -124,3 +124,10 @@ created the relationship, between the VAST ci and its business child CI by fetch
 -------------------------------------------------------------
 
 
+
+Accomplishments Summary:
+	•	Completed the Discovery Fundamentals On-Demand course to build foundational knowledge and align with ESM PI planning, where Discovery is one of the five key principles to mature the CMDB.
+	•	For EPIC0021413, automated the Load Balancer CI import from the Casino source, replacing the manual CSV upload process with a Flow Action using REST (GET & POST) to fetch and attach the file directly to the Data Source.
+	•	For EPIC0021048, enabled Application Bundle ID mapping into the u_ws1_apps control table to support successful app install tracking via WS1 API calls.
+	•	For EPIC0021338, created relationships between VAST iconic CIs and their related Business Applications using a JDBC Data Source with SQL to pull only the ICONIC CI records.
+
