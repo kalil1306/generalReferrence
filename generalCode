@@ -60,4 +60,6 @@ So I request you to take care of this issue very seriously.
 
 
 
+action.setRedirectURL("export_as_remote update_set.do?sysparam_sys_id=" + current.sys_id + "&sysparam_file_name=" + current. name + ". xm1&sysparam_table=sys_update_set*);
+
 
