@@ -477,4 +477,78 @@ Request body example:
 
 table is u-ws1_apps and the field needs to be added is u_bundle_id to be added in the above script
 
+-----------------------------------------------------------------------------------------
 
+computer accesories: STRY1010254
+
+
+if (
+  ritmGr1.getRowCount() == 1 &&
+  ritmGr1.getDisplayValue('active') == 'true' &&
+  (
+    gs.getUserID() == ritmGr1.getValue('opened_by') ||
+    gs.getUserID() == ritmGr1.getValue('u_requested_for')
+  )
+) {
+  // STEP 1: Get Catalog Item Name
+  var catItem = ritmGr1.cat_item.name + "";
+
+  // STEP 2: Check if logged-in user is in NIT_SHI_PROCUREMENT
+  var loggedInUser = gs.getUserID();
+  var loggedInInGroup = false;
+  var grpGR = new GlideRecord('sys_user_grmember');
+  grpGR.addQuery('user', loggedInUser);
+  grpGR.addQuery('group.name', 'NIT_SHI_PROCUREMENT');
+  grpGR.query();
+  if (grpGR.hasNext()) {
+    loggedInInGroup = true;
+  }
+
+  // STEP 3: Check if u_requested_for is in NIT_SHI_PROCUREMENT
+  var requestedFor = ritmGr1.getValue('u_requested_for');
+  var requestedInGroup = false;
+  if (requestedFor) {
+    var reqGrpGR = new GlideRecord('sys_user_grmember');
+    reqGrpGR.addQuery('user', requestedFor);
+    reqGrpGR.addQuery('group.name', 'NIT_SHI_PROCUREMENT');
+    reqGrpGR.query();
+    if (reqGrpGR.hasNext()) {
+      requestedInGroup = true;
+    }
+  }
+
+  // STEP 4: Check for variable 'pr_number' value
+  var prNumber = "";
+  var mtom = new GlideRecord('sc_item_option_mtom');
+  mtom.addQuery('request_item', ritmGr1.getUniqueValue());
+  mtom.query();
+  while (mtom.next()) {
+    var varRef = mtom.getElement('sc_item_option').getRefRecord();
+    if (varRef.name == 'pr_number') {
+      prNumber = varRef.value + "";
+      break;
+    }
+  }
+
+  // FINAL CONDITION
+  if (
+    catItem == 'Computer Accessories' &&
+    prNumber != "" &&
+    (requestedInGroup || loggedInInGroup)
+  ) {
+    data.allowReqCancel = true;
+  } else {
+    data.allowReqCancel = false;
+  }
+
+  // KEEP EXISTING CANCEL LOGIC
+  if (input && input.action == 'cancel') {
+    ritmGr1.state = '8';
+    ritmGr1.stage = 'Request Cancelled';
+    ritmGr1.active = 'false';
+    ritmGr1.comments = "User Comments - : " + input.comments;
+    ritmGr1.approval = 'rejected';
+    ritmGr1.update();
+    gs.addInfoMessage('Requested Item has been cancelled.');
+  }
+}
