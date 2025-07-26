@@ -530,6 +530,39 @@ if (
     }
   }
 
+
+var prNumber = "";
+var mtom = new GlideRecord('sc_item_option_mtom');
+mtom.addQuery('request_item', ritmGr1.getUniqueValue());
+mtom.query();
+
+while (mtom.next()) {
+    // Step 1: Get sc_item_option sys_id
+    var optionSysId = mtom.getValue('sc_item_option');
+    if (!optionSysId) continue;
+
+    // Step 2: Get sc_item_option record
+    var optionGR = new GlideRecord('sc_item_option');
+    if (!optionGR.get(optionSysId)) continue;
+
+    // Step 3: Get item_option_new sys_id
+    var variableDefSysId = optionGR.getValue('item_option_new');
+    if (!variableDefSysId) continue;
+
+    // Step 4: Get item_option_new record
+    var variableDefGR = new GlideRecord('item_option_new');
+    if (!variableDefGR.get(variableDefSysId)) continue;
+
+    // Step 5: Check if variable name is 'pr_number'
+    if (variableDefGR.name == 'pr_number') {
+        prNumber = optionGR.getValue('value') + "";
+        break;
+    }
+}
+
+
+
+
   // FINAL CONDITION
   if (
     catItem == 'Computer Accessories' &&
