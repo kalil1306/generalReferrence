@@ -612,6 +612,15 @@ api.controller = function(spUtil, $window, $scope) {
         });
     };
 };
+
+if cat_item is Computer Accessories and u_requested_for or logged in user is a member of this
+NIT_SHI_PROCUREMENT assignment group and a variable in the requested item
+called is pr_number should be generated then we can allow the logged in user to
+cancel this requested item from the portal, they can click the button called ‘Cancel
+this Requested’ if the condition fails this widget should not get visible in the
+portal and it should not impact on any existing code with this above logic.
+
+How to achieve this scenario in the above code?
 ..................................................................................................
 
 UI Action: RITM
@@ -829,6 +838,7 @@ fnCancelRequest: function(sysid, comments) {
         return status;
     },
 
+---------------------------------------------------------------------------------------------------------------------
 
 
 
