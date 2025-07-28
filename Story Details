@@ -478,110 +478,361 @@ Request body example:
 table is u-ws1_apps and the field needs to be added is u_bundle_id to be added in the above script
 
 -----------------------------------------------------------------------------------------
+STRY1010254 - Widget update 
+Widget Name: Cancel Request
+HTML Template:
+<div ng-if="data.table == 'sc_request'" class="panel panel-default">
+   
+    <div ng-if="data.allowReqCancel">
+      <div class="panel-body">
+    <h3 class="panel-title">
+      Don't need to do this anymore? Feel free to cancel your request.
+    </h3>
+      
+    <br>
+    <label>Cancellation comments:</label>
+    <br>
+    <textarea ng-model="data.comments" ng-Keydown="keyDown(data.sys_id);" ng-click="keyDown(data.sys_id);" placeholder="*Required to Cancel{{data.methodName}}" class="form-control txt-cancel" rows="3" id="{{data.sys_id}}"></textarea>
+  <br/>
+    <button type="button" class="btn btn-default" ng-click="c.uiAction('cancel')">Cancel this Request</button>     
+    </div>
+  </div>
+  </div>
 
-computer accesories: STRY1010254
+Server Script:
+(function() {
+
+	// Get table & sys_id
+	data.table = input.table || $sp.getParameter("table");
+	data.sys_id = input.sys_id || $sp.getParameter("sys_id");
+
+	//To display the widget.
+	data.allowReqCancel = false;
+	if (data.table == 'sc_request') {
+		var req = new GlideRecord("sc_request");
+		req.addQuery("sys_id", data.sys_id);
+		req.query();
+		
+		var ritmGr1 = new GlideRecord('sc_req_item');
+		ritmGr1.addQuery('request', data.sys_id);
+		ritmGr1.addQuery('cat_item', '!=', '7646fef2dbc92c5085e74cd23996191b'); // Dont allow user to cancel request for Computer Refresh form
+		ritmGr1.addQuery('cat_item', '!=', 'b047048f132ad200727db9785144b024'); // Don't allow users to cancel request for Desktop, Laptop, Mac Requests form
+		ritmGr1.query();
+		ritmGr1.getRowCount();
+
+		if (ritmGr1.next()) {
+			if(req.next() && req.getDisplayValue('active') == 'true'){
+				//STRY0998494 - Allowing cancellation for the Order guide requests
+				if (ritmGr1.getRowCount() >= 1 && ritmGr1.getDisplayValue('active') == 'true' && (gs.getUserID() == ritmGr1.getValue('opened_by') || gs.getUserID() == ritmGr1.getValue('u_requested_for'))) { 
+					data.allowReqCancel = true;
+				}
+				if (ritmGr1.getRowCount() > 1 && gs.getUserID() == ritmGr1.getValue('opened_by')) {
+					data.allowReqCancel = true;
+				}
+			}
+		}
+	}
+
+	// Valid GlideRecord
+	var gr = new GlideRecord(data.table);
+	if (!gr.isValid())
+		return;
+
+	// Valid sys_id
+	if (!gr.get(data.sys_id))
+		return;
+
+	if (input && input.action) {
+		var action = input.action;
+
+		// If SC Request table
+		if (data.table == 'sc_request') {
+			if (action == 'cancel') {
+				/*if (gr.active == true){
+                	gr.request_state = 'closed_cancelled';
+                	gr.update();
+                	new UIActionUtils().approvalsNoLongerRequired(data.sys_id);
+                }*/
+
+				var ritmGr = new GlideRecord('sc_req_item');
+				ritmGr.addQuery('request', data.sys_id);
+				ritmGr.query();
+				//var ritmCount = ritmGr.getRowCount();
+
+				while (ritmGr.next()) {
+					var stageVal = ritmGr.getValue('stage').toUpperCase();
 
 
-if (
-  ritmGr1.getRowCount() == 1 &&
-  ritmGr1.getDisplayValue('active') == 'true' &&
-  (
-    gs.getUserID() == ritmGr1.getValue('opened_by') ||
-    gs.getUserID() == ritmGr1.getValue('u_requested_for')
-  )
-) {
-  // STEP 1: Get Catalog Item Name
-  var catItem = ritmGr1.cat_item.name + "";
+					if (ritmGr.getDisplayValue('active') == 'true' && (gs.getUserID() == ritmGr.getValue('opened_by') || gs.getUserID() == ritmGr.getValue('u_requested_for'))) {
+						gr.request_state = 'closed_cancelled';
+						ritmGr.comments = "Cancel Request : " + input.comments;
+						ritmGr.update();
+						new UIActionUtils().approvalsNoLongerRequired(data.sys_id);
+					}
+				}
+				gs.addInfoMessage('Request has been cancelled.');
+				gr.update();
+			}
+		}
+	}
+})();
 
-  // STEP 2: Check if logged-in user is in NIT_SHI_PROCUREMENT
-  var loggedInUser = gs.getUserID();
-  var loggedInInGroup = false;
-  var grpGR = new GlideRecord('sys_user_grmember');
-  grpGR.addQuery('user', loggedInUser);
-  grpGR.addQuery('group.name', 'NIT_SHI_PROCUREMENT');
-  grpGR.query();
-  if (grpGR.hasNext()) {
-    loggedInInGroup = true;
-  }
+CLient Contorller:
+api.controller = function(spUtil, $window, $scope) {
+    /* widget controller */
+    var c = this;
+    $scope.data.loadUpdate = false;
+	c.uiAction = function(action) {
+	
+		var comments = $scope.data.comments;
+        if (null == comments || comments === "" || (comments === "*Required to " + action)) {
+					if($scope.data.table == 'sc_request')
+            spUtil.addErrorMessage("Comment is required to " + action + " Request.");
+            return;
+        }
+		var x = {};
+		var sys_id = $scope.data.sys_id;
+		x.sys_id = sys_id;
+		x.table = $scope.data.table; 
+		
+		
 
-  // STEP 3: Check if u_requested_for is in NIT_SHI_PROCUREMENT
-  var requestedFor = ritmGr1.getValue('u_requested_for');
-  var requestedInGroup = false;
-  if (requestedFor) {
-    var reqGrpGR = new GlideRecord('sys_user_grmember');
-    reqGrpGR.addQuery('user', requestedFor);
-    reqGrpGR.addQuery('group.name', 'NIT_SHI_PROCUREMENT');
-    reqGrpGR.query();
-    if (reqGrpGR.hasNext()) {
-      requestedInGroup = true;
-    }
-  }
+		if($scope.data.table == 'sc_request'){
+			x.method = 'closed_cancelled';
+			x.comments = comments.trim();
+		}
+			else {
+			return;
+		}
+		$scope.data.sys_id = x.sys_id;
+        c.data.action = action;
+        c.server.update().then(function() {
+        c.data.action = undefined;
+			  $window.location.reload();
+        });
+    };
+};
+..................................................................................................
 
-  // STEP 4: Check for variable 'pr_number' value
-  var prNumber = "";
-  var mtom = new GlideRecord('sc_item_option_mtom');
-  mtom.addQuery('request_item', ritmGr1.getUniqueValue());
-  mtom.query();
-  while (mtom.next()) {
-    var varRef = mtom.getElement('sc_item_option').getRefRecord();
-    if (varRef.name == 'pr_number') {
-      prNumber = varRef.value + "";
-      break;
-    }
-  }
+UI Action: RITM
+Action name: Button
 
+condition: 
+new VZ_SC_CancelRequestOrRITM().fnCheckCancelRITM(current)
 
-var prNumber = "";
-var mtom = new GlideRecord('sc_item_option_mtom');
-mtom.addQuery('request_item', ritmGr1.getUniqueValue());
-mtom.query();
+Script:
+var cancelRITM = new VZ_SC_CancelRequestOrRITM().fnCancelRITM(current.sys_id, current.comments);
+if(!cancelRITM){
+	current.setAbortAction(true);
+}
 
-while (mtom.next()) {
-    // Step 1: Get sc_item_option sys_id
-    var optionSysId = mtom.getValue('sc_item_option');
-    if (!optionSysId) continue;
+Script include functions:
 
-    // Step 2: Get sc_item_option record
-    var optionGR = new GlideRecord('sc_item_option');
-    if (!optionGR.get(optionSysId)) continue;
+    fnCheckCancelRITM: function(current) {
+        //var stageVal = current.stage.toUpperCase();	
+        var allowCancel = false;
 
-    // Step 3: Get item_option_new sys_id
-    var variableDefSysId = optionGR.getValue('item_option_new');
-    if (!variableDefSysId) continue;
+        /*if (('REQUEST CANCELLED' != stageVal && 'COMPLETE' != stageVal && 'COMPLETED' != stageVal && 'VERIFICATION' != stageVal && 'DELIVERY' != stageVal)
+        	&& current.active == true 
+        	&& (gs.hasRole('catalog_admin') || gs.getUserID() == current.request.requested_for || gs.getUserID() == current.request.u_contact || gs.getUserID() == current.opened_by)
+        	)
+        {
+        	
+        	allowCancel = true;	
+        	
+        	var tskGr = new GlideRecord('sc_task');
+        		tskGr.addQuery('request_item',current.sys_id);
+        		tskGr.addQuery('u_integration_task', 'true');
+        		tskGr.query();
+        		
+        		if(tskGr.getRowCount() > 0){
+        			allowCancel = false;				
+        		} 
+        }*/
+        if (current.active == true &&
+            (gs.getUserID() == current.u_requested_for || gs.getUserID() == current.request.u_contact || gs.getUserID() == current.opened_by) &&
+            (current.state != 3 || current.state != 4 || current.state != 8) &&
+            (current.cat_item != '7646fef2dbc92c5085e74cd23996191b') && (current.cat_item != 'b047048f132ad200727db9785144b024')) {         
+                allowCancel = true;
+            }
+        return allowCancel;
+    },
+..............................................................
+fnCancelRITM: function(sysid, comments) {
+        var status = false;
+        var scGr = new GlideRecord("sc_req_item");
+        if (comments && null == comments || comments == '') {
+            gs.addErrorMessage('Please include additional comments indicating reason for cancellation.');
+        } else {
+            var allowCancel = false;
 
-    // Step 4: Get item_option_new record
-    var variableDefGR = new GlideRecord('item_option_new');
-    if (!variableDefGR.get(variableDefSysId)) continue;
+            if (scGr.get(sysid)) {
+                var stageVal = scGr.stage.toUpperCase();
 
-    // Step 5: Check if variable name is 'pr_number'
-    if (variableDefGR.name == 'pr_number') {
-        prNumber = optionGR.getValue('value') + "";
-        break;
-    }
+                if (('REQUEST CANCELLED' != stageVal && 'COMPLETE' != stageVal && 'COMPLETED' != stageVal && 'VERIFICATION' != stageVal && 'DELIVERY' != stageVal) &&
+                    scGr.active == true &&
+                    (gs.getUserID() == scGr.u_requested_for || gs.getUserID() == scGr.request.u_contact || gs.getUserID() == scGr.opened_by)
+                ) {
+
+                    allowCancel = true;
+
+                    var tskGr = new GlideRecord('sc_task');
+                    tskGr.addQuery('request_item', scGr.sys_id);
+                    tskGr.addQuery('u_integration_task', 'true');
+                    tskGr.query();
+
+                    if (tskGr.getRowCount() > 0) {
+                        allowCancel = false;
+                    }
+                }
+
+                if (allowCancel) {
+                    scGr.stage = 'Request Cancelled';
+                    scGr.comments = 'Cancel RITM: ' + comments;
+                    scGr.state = '8';
+                    scGr.active = false;
+                    scGr.update();
+                    status = true;
+                } else {
+                    gs.addErrorMessage('Unable to cancel your request because the automated delivery process has already started.');
+                }
+
+            }
+
+        }
+
+        return status;
+    },
+...............................................................
+
+UI Action: REQUEST
+Action name: Cancel Request
+
+Condition: 
+ (new VZ_SC_CancelRequestOrRITM().fnCheckCancelRequest(current))
+
+script:
+var cancelRequest = new VZ_SC_CancelRequestOrRITM().fnCancelRequest(current.sys_id, current.comments);
+if(!cancelRequest){
+	current.setAbortAction(true);
 }
 
 
+script include:
+  fnCheckCancelRequest: function(current) {
+        var allowCancel = false;
+        var stateVal = current.state;
+        var req = new GlideRecord('sc_req_item');
+        req.addQuery('request', current.sys_id);
+        req.addQuery('cat_item', '!=', '7646fef2dbc92c5085e74cd23996191b');
+		req.addQuery('cat_item', '!=', 'b047048f132ad200727db9785144b024');//to hide cancel button for stry STRY0883145
+        req.addActiveQuery();
+        req.query();
+        if (req.next()) {
+            if ((gs.getUserID() == current.u_contact || gs.getUserID() == current.opened_by) &&
+                ('7' != stateVal && '4' != stateVal && '3' != stateVal)) {
+                allowCancel = true;
+                
+            }
+            if (!allowCancel && ('7' != stateVal && '4' != stateVal && '3' != stateVal)) {
+                var ri = new GlideAggregate('sc_req_item');
+                ri.addQuery('request', current.sys_id);
+                ri.addAggregate('COUNT', 'u_requested_for');
+                ri.query();
+                if (ri.getRowCount() == 1) {
+                    ri.next();
+                    if (gs.getUserID() == ri.getValue('u_requested_for')) {
+                        allowCancel = true;
+                    }
+                }
+            }
+        }
+
+        return allowCancel;
+    },
+..........................................
+
+fnCancelRequest: function(sysid, comments) {
+        var app = new GlideRecord('sc_request');
+        var status = false;
+        if (comments && null == comments || comments == '') {
+            gs.addErrorMessage('Please include additional comments indicating reason for cancellation.');
+            return status;
+        }
+
+        if (app.get(sysid)) {
+
+            var cancelRITM = [];
+
+            var ritmGr = new GlideRecord('sc_req_item');
+            ritmGr.addQuery('request', sysid);
+            ritmGr.query();
+
+            var ritmCount = ritmGr.getRowCount();
+
+            while (ritmGr.next()) {
+                var stageVal = ritmGr.getValue('stage').toUpperCase();
+
+                if (('REQUEST CANCELLED' != stageVal && 'COMPLETE' != stageVal &&
+                        'COMPLETED' != stageVal && 'VERIFICATION' != stageVal && 'DELIVERY' != stageVal) && ritmGr.getValue('active') == true &&
+                    (gs.getUserID() == ritmGr.u_requested_for || gs.getUserID() == app.u_contact || gs.getUserID() == app.opened_by)) {
+
+                    var allowCancel = true;
+                    var tskGr = new GlideRecord('sc_task');
+                    tskGr.addQuery('request_item', ritmGr.getValue('sys_id'));
+                    tskGr.addQuery('u_integration_task', 'true');
+                    tskGr.query();
+
+                    if (tskGr.getRowCount() > 0) {
+                        allowCancel = false;
+                    }
+
+                    if (allowCancel) {
+                        cancelRITM.push(ritmGr.getValue('sys_id').toString());
+                    }
+                }
+            }
+
+            if (cancelRITM && cancelRITM.length > 0) {
+                for (var i = 0; i < cancelRITM.length; i++) {
+                    var ritmApp = new GlideRecord('sc_req_item');
+                    ritmApp.get(cancelRITM[i]);
+                    if (ritmApp) {
+                        ritmApp.comments = 'Cancel Request: ' + comments;
+                        ritmApp.stage = 'Request Cancelled';
+                        ritmApp.state = '8';
+                        ritmApp.active = false;
+                        ritmApp.update();
+                    }
+                }
+
+                app.comments = 'Cancel Request: ' + comments;
+                app.update();
+                status = true;
+
+            } else {
+
+                if (ritmCount == 0) {
+                    app.request_state = 'closed_cancelled';
+                    app.stage = 'closed_complete';
+                    app.comments = 'Cancel Request: ' + comments;
+                    app.update();
+                    status = true;
+                } else {
+                    //app.comments = 'Dependencies detected. Unable to Cancel Request. User comments: ' + comments;
+                    //app.update();
+                    gs.addErrorMessage('Unable to cancel your request because the automated delivery process has already started.');
+                }
+
+            }
+        }
+        return status;
+    },
 
 
-  // FINAL CONDITION
-  if (
-    catItem == 'Computer Accessories' &&
-    prNumber != "" &&
-    (requestedInGroup || loggedInInGroup)
-  ) {
-    data.allowReqCancel = true;
-  } else {
-    data.allowReqCancel = false;
-  }
 
-  // KEEP EXISTING CANCEL LOGIC
-  if (input && input.action == 'cancel') {
-    ritmGr1.state = '8';
-    ritmGr1.stage = 'Request Cancelled';
-    ritmGr1.active = 'false';
-    ritmGr1.comments = "User Comments - : " + input.comments;
-    ritmGr1.approval = 'rejected';
-    ritmGr1.update();
-    gs.addInfoMessage('Requested Item has been cancelled.');
-  }
-}
+
+
+
+
+
