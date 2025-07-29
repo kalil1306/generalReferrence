@@ -666,6 +666,15 @@ Script include functions:
             }
         return allowCancel;
     },
+
+if cat_item is Computer Accessories and u_requested_for or logged in user is a member of this
+NIT_SHI_PROCUREMENT assignment group and a variable in the requested item
+called is pr_number should be generated then we can allow the logged in user to
+cancel this requested item in the Native(platform) UI in the UI action, the above code is existing 
+code it should not impact the existing code and create this logic as a separate function so that it can be
+reused
+
+How to implement this scenario without affecting the existing code?
 ..............................................................
 fnCancelRITM: function(sysid, comments) {
         var status = false;
