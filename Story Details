@@ -675,6 +675,65 @@ code it should not impact the existing code and create this logic as a separate 
 reused
 
 How to implement this scenario without affecting the existing code?
+
+answer:
+
+fnCheckComputerAccessoriesRITM: function(current) {
+    var ritmGr;
+
+    // Handle if current is sc_req_item
+    if (current.getTableName() == 'sc_req_item') {
+        ritmGr = current;
+    }
+
+    // Handle if current is sc_request
+    else if (current.getTableName() == 'sc_request') {
+        var temp = new GlideRecord('sc_req_item');
+        temp.addQuery('request', current.sys_id);
+        temp.addQuery('cat_item.name', 'Computer Accessories'); // Optimize early
+        temp.query();
+        if (!temp.next()) return false;
+        ritmGr = temp;
+    } else {
+        return false; // Unsupported table
+    }
+
+    // Validate catalog item
+    var catItem = ritmGr.cat_item.name + "";
+    if (catItem != 'Computer Accessories') return false;
+
+    // Validate group membership (either user or requested_for)
+    var loggedInUser = gs.getUserID();
+    var requestedFor = ritmGr.getValue('u_requested_for');
+
+    var groupCheck = new GlideRecord('sys_user_grmember');
+    groupCheck.addQuery('group.name', 'NIT_SHI_PROCUREMENT');
+    groupCheck.addQuery('user', 'IN', [loggedInUser, requestedFor].join(','));
+    groupCheck.query();
+
+    if (!groupCheck.hasNext()) return false;
+
+    // Check if pr_number exists and has value
+    var prNumber = "";
+    var mtom = new GlideRecord('sc_item_option_mtom');
+    mtom.addQuery('request_item', ritmGr.getUniqueValue());
+    mtom.query();
+
+    while (mtom.next()) {
+        var optionGR = new GlideRecord('sc_item_option');
+        if (!optionGR.get(mtom.getValue('sc_item_option'))) continue;
+
+        var defGR = new GlideRecord('item_option_new');
+        if (!defGR.get(optionGR.getValue('item_option_new'))) continue;
+
+        if (defGR.name == 'pr_number') {
+            prNumber = optionGR.getValue('value') + "";
+            break;
+        }
+    }
+
+    return prNumber != "";
+}
 ..............................................................
 fnCancelRITM: function(sysid, comments) {
         var status = false;
