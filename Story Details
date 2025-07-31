@@ -907,9 +907,47 @@ fnCancelRequest: function(sysid, comments) {
     },
 
 ---------------------------------------------------------------------------------------------------------------------
+STRY1032461:
+Requirement:
+
+1.For ‘US New Hire’
+Add a mandatory drop box beneath the Employee Type Field   with label “Image For ” with the following options: {Corporate, EDN, Vz Connect}  and default to Corporate.
+
+
+2.For US New Hire
+If EDN is selected in the new “Image For” box, display a message below the box with the following content.
+Label Message: Your new hire must have an EDN account in order for the requested device to be provisioned.  Please see KB0026919 for more information 
+
+
+3.For ‘US New Hire’ 
+If ‘Requested For’ and ‘Opened by’ field contains the same person name, warn the user with 
+a. Popup message - It's an invalid request, both the ‘Requested For’ and Submitter name cannot be the same. Please provide the new hire’s Name and Enterprise ID (EID) in the below respective fields. 
+b. On close of this pop message, Display 2 new mandatory fields just below the 'Request Type' field- 
+ 	(i) New Hire Name 
+       (ii) Enterprise ID (EID) - EID should only accept 9 or 10 digits, nothing more or less and no letters or special characters. 
+
+We need to ‘Save’ the values of these fields in the table. 
+
+
+4.For US New Hire:
+Add a warning popup as shown below and also mandate (only for this scenario) the user to provide an explanation in the existing additional information field
+if the ‘requested for’ person already has a device and 
+if they are assigned an asset that is in use and online in the past 30 days  (here the validation is we need to check the CI data to take past 30 days, if it is not available, we will use the last login date is on or before last 30 days)
+Popup message:
+Your new hire <name> already has <hostname> - <model name> assigned.   If this device is suitable for your new hires' needs, the device can be retained from their previous position and this form should not be submitted.   A request should only be submitted if the device does not meet the needs of the new job role.  If you proceed the existing device must be returned within 30 days or it will be disabled.
 
 
 
+5.For US New Hire and Upgrade Replace:
+If the device is discretionary or custom the RITM requires one additional higher level for approval
+
+6.For US New Hire requests where contractor is selected, 
+Display an additional mandatory multi-line text field that asks for the reason,
+Field name -  Please provide the reason, this contractor requires a physical device and cannot use the Citrix or Secure Browser solutions.
+Just save the received input in the table. 
+
+7.Validate the logic for US New Hire and Upgrade 
+Random users are managing to submit requests without devices being selected.  Ensure that a device type must be selected in order to submit the form.
 
 
 
