@@ -154,3 +154,49 @@ Age in Seconds: 2592000  (30 Days)
 
 I want this above statements to be more elaborated because these are my accomplishments that I have to keep an email to my manager
 
+
+final:
+
+Subject: Accomplishments Update – ServiceNow Enhancements
+
+Hi [Manager’s Name],
+
+I would like to share some of the key accomplishments I have completed in ServiceNow during this sprint:
+	1.	Lost/Stolen Device Ordering Flow Enhancement
+	•	Resolved a critical issue where Test/Demo users reporting a Lost/Stolen device were not provided with the option to order the same type of replacement device.
+	•	For example, when a user reported a Lost/Stolen Smartphone (iPhone), the replacement option did not include Smartphone, but displayed unrelated device types such as Basic Phone, Tablet, Mobile Connectivity Device.
+	•	Enhanced the ordering logic so that users will now only see the same type of device available for replacement, ensuring consistency and accuracy in the Lost/Stolen device replacement workflow.
+	•	Additionally, corrected an issue in the RITM view where the Alternate Shipping Address was not being displayed fully. The Address Line 2 value was not appended earlier, but now the complete address is displayed, improving clarity for request tracking.
+	•	This was a critical fix delivered towards the end of the sprint, which required me to quickly understand the existing implementation and make targeted changes without breaking other dependencies.
+	2.	API Encryption Update for Casino Load Balancer Data (Zurich Release)
+	•	As part of the ServiceNow Zurich release readiness, identified and remediated the upcoming deprecation of the GlideEncrypter API call.
+	•	Implemented the new encryption method for API connections used to retrieve Casino Load Balancer data, ensuring the integration continues to function seamlessly post-upgrade.
+	•	This proactive change prevents potential disruptions in data flow once Zurich release goes live.
+	3.	CMDB Auto Flush for Jabber Software Instances
+	•	Created a new Auto Flush [sys_auto_flush] job for the cmdb_software_instance table to automatically remove stale Jabber records.
+	•	Configured the job to identify records where:
+	•	The Name starts with “Jabber”
+	•	The record has not been updated in the past 30 days (2,592,000 seconds)
+	•	This automated cleanup improves CMDB data quality, reduces noise from outdated software instances, and ensures that reporting and reconciliation processes rely on accurate data.
+	4.	Computer Accessories Order Cancellation Restriction (Ariba PR Integration)
+	•	Implemented a solution to restrict users from cancelling Computer Accessories requests once a Purchase Requisition (PR #) has been created in Ariba.
+	•	This required enhancing logic in the AYS (At Your Service) Service Portal widget while ensuring the change did not impact other global widgets or existing request workflows.
+	•	The solution involved precise customization to maintain global widget stability while addressing the specific cancellation control requirement.
+	•	This change ensures proper alignment with procurement processes and prevents business disruptions caused by cancellations after the PR has been established.
+
+⸻
+
+These accomplishments required working across Catalog Items, RITM views, Service Portal widgets, CMDB auto-flush jobs, and API integrations, strengthening my technical expertise in ServiceNow scripting, data management, and platform upgrade readiness.
+
+Thanks,
+[Your Name]
+
+
+
+
+
+
+
+
+
+
