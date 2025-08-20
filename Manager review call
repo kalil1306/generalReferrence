@@ -131,3 +131,26 @@ Accomplishments Summary:
 	•	For EPIC0021048, enabled Application Bundle ID mapping into the u_ws1_apps control table to support successful app install tracking via WS1 API calls.
 	•	For EPIC0021338, created relationships between VAST iconic CIs and their related Business Applications using a JDBC Data Source with SQL to pull only the ICONIC CI records.
 
+--------------------------------------------------------------------------------------------------------------
+August 20, 2025 - Q3 Accomplishments
+
+1. Test/Demo user reporting Lost/Stolen device does not have option of ordering same type of device.
+Ex.  Using MTN 4702330768 to report Lost/Stolen.  This device in Handheld Computing is Smartphone (iPhone) but Smartphone is not an option for replacement.  All others appear (Basic Phone, Tablet, Mobile connectivity-type device).  When a ordering a replacement, the user should only see the same type of device.
+and In the RITM view, the whole alternate address is not displayed correctly, the Address 2 value is not added to the full Alternate Shipping Address.
+
+this fix is very critical, at the end of sprint it challenged me to understand how the existing functionality made at a very shorter period
+
+2. As of the ServiceNow Zurich release, the call GlideEncrypter will be deprecated and a new method will need to be used to leverage the API connection for retrieving the Casino Load Balancer data
+
+3. Created a new Auto flush for cmdb_software_instance where the record is not updated for 30 days before from the current date and name starts with Jabber
+A Table Cleaner [sys_auto_flush] record needs to be created that will remove stale Jabber records from Software Instance.
+Table: cmdb_software_instance
+Filter: Name starts with "Jabber"
+Match Field: sys_updated_on
+Age in Seconds: 2592000  (30 Days)
+
+4. For the Computer Accessories catalog item, once a PR # is established with Ariba, the customer should no longer be able to cancel the order via the AYS interface. We need to disable the ability for users to cancel this specific type of request once the PR # is opened for Ariba. here the challenge to stop cancelling the request that needs to be touch the exisiting widgets in the service portal that should not impact globally since its a global widget and getting more technical skills in service portal scripting
+
+
+I want this above statements to be more elaborated because these are my accomplishments that I have to keep an email to my manager
+
