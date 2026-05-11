@@ -1,0 +1,159 @@
+1. Auto-Close Related Tasks
+Scenario: When an Incident's state changes to "Closed," all associated Incident Tasks (incident_task) should also be closed automatically.
+Logic: Query the child table using the parent's sys_id.
+
+Answer:
+
+var taskGr = new GlideRecord('incident_task');
+taskGr.addQuery('incident', current.sys_id);
+taskGr.addActiveQuery(); // Only get open tasks
+taskGr.query();
+while (taskGr.next()) {
+    taskGr.state = 7; // Value for Closed
+    taskGr.update();
+}
+
+2. Preventing Incident Closure with Open Tasks
+Scenario: A user tries to close an Incident, but there are still open Incident Tasks. Prevent the closure and show an error message.
+Logic: Use a Before Business Rule.
+
+Answer:
+var taskGr = new GlideRecord('incident_task');
+taskGr.addQuery('incident', current.sys_id);
+taskGr.addActiveQuery();
+taskGr.query();
+if (taskGr.hasNext()) {
+    gs.addErrorMessage("You cannot close this Incident while there are active tasks.");
+    current.setAbortAction(true);
+}
+
+3. Identify High-Priority Incidents for a User
+Scenario: Find the most recent "Priority 1" incident opened by a specific user to display it in a custom portal widget.
+Logic: Use orderByDesc and setLimit.
+
+Answer:
+
+var inc = new GlideRecord('incident');
+inc.addQuery('caller_id', 'sys_id_of_user');
+inc.addQuery('priority', 1);
+inc.orderByDesc('sys_created_on');
+inc.setLimit(1);
+inc.query();
+if (inc.next()) {
+    gs.print("Latest P1: " + inc.number);
+}
+
+
+4. Bulk Reassignment of Incidents
+Scenario: A specific Assignment Group is being deprecated. You need to move all their "Active" incidents to a new group.
+Logic: Use setWorkflow(false) to avoid spamming users with notifications during a mass update.
+
+var inc = new GlideRecord('incident');
+inc.addQuery('assignment_group', 'old_group_sys_id');
+inc.addActiveQuery();
+inc.query();
+inc.setValue('assignment_group', 'new_group_sys_id');
+inc.setWorkflow(false); // Do not trigger Business Rules/Notifications
+inc.updateMultiple();
+
+
+5. Check for Duplicate Incidents
+Scenario: Before creating a new Incident, check if there is already an active Incident with the same "Short Description" and "Caller."
+Logic: Use multiple addQuery conditions.
+
+Answer:
+
+var dup = new GlideRecord('incident');
+dup.addActiveQuery();
+dup.addQuery('caller_id', current.caller_id);
+dup.addQuery('short_description', current.short_description);
+dup.query();
+if (dup.hasNext()) {
+    gs.addInfoMessage("A similar incident already exists for this caller.");
+}
+
+6. Link Incident to Change Request
+Scenario: An Incident was caused by a Change. Write a script to update the "Caused by Change" field on the Incident record from the Change Request side.
+Logic: Update a record on a different table using a known reference.
+
+Answer:
+
+var inc = new GlideRecord('incident');
+if (inc.get(current.parent_incident_field)) { // Assume a custom field stores the INC sys_id
+    inc.caused_by = current.sys_id;
+    inc.update();
+}
+
+
+7. Auto-Populate Change Implementer
+Scenario: When a Change Request is created, if the "Assignment Group" is "Server Admin," automatically set the "Assigned to" to the Manager of that group.
+
+Logic: Dot-walking via GlideRecord.
+
+Answer:
+var group = new GlideRecord('sys_user_group');
+if (group.get(current.assignment_group)) {
+    current.assigned_to = group.manager;
+}
+
+
+
+8. Cancel Change if No CI is Associated
+Scenario: If a Change Request moves to "Assess" state but the "Configuration Item" (CI) field is empty, move it back to "New."
+
+Logic: Validation in a Before Business Rule.
+
+Answer:
+
+if (current.cmdb_ci.nil()) {
+    gs.addErrorMessage("A Configuration Item is required to move to Assess.");
+    current.state = -5; // Value for New
+    current.setAbortAction(true);
+}
+
+
+
+9. Finding Scheduled Changes for a CI
+Scenario: A technician wants to see if there are any "Scheduled" changes for a specific Server (CI) in the next 7 days.
+
+Logic: Use an encoded query for date ranges.
+Answer:
+
+var change = new GlideRecord('change_request');
+change.addQuery('cmdb_ci', 'server_sys_id');
+change.addQuery('state', -2); // Value for Scheduled
+change.addEncodedQuery('start_dateRELATIVEGE@dayofweek@ahead@7'); 
+change.query();
+while (change.next()) {
+    gs.print("Upcoming Change: " + change.number);
+}
+
+
+10. Counting Incidents Caused by a Change
+Scenario: On the Change Request form, display a count of how many Incidents have been linked to this Change as "Caused by Change."
+
+Logic: Use GlideAggregate for counting (Best Practice).
+
+Answer:
+
+var count = new GlideAggregate('incident');
+count.addQuery('caused_by', current.sys_id);
+count.addAggregate('COUNT');
+count.query();
+var incidentCount = 0;
+if (count.next()) {
+    incidentCount = count.getAggregate('COUNT');
+}
+gs.addInfoMessage("This change has caused " + incidentCount + " incidents.");
+
+
+Key Takeaways for the Interview:
+Always use GlideAggregate for counting. It's the most common "trap" question for 2-year experience candidates.
+
+Explain setWorkflow(false): Interviewers want to know you care about system performance and user experience (not sending 1,000 emails by mistake).
+
+Client vs. Server: Remind the interviewer that all the above are Server-side scripts and should be placed in Business Rules, Script Includes, or Scheduled Jobs.
+
+
+
+
